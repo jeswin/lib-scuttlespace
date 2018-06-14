@@ -6,7 +6,7 @@ import Response from "../../Response";
 import { IMessage } from "../../types";
 
 export default async function createIdentity(
-  id: string,
+  identityId: string,
   sender: string,
   command: string,
   message: IMessage
@@ -15,43 +15,43 @@ export default async function createIdentity(
 
   // See if the user already exists.
   const user = db
-    .prepare(`SELECT * FROM user WHERE sender=$sender`)
+    .prepare(`SELECT * FROM user WHERE id=$sender`)
     .get({ sender });
 
   db.transaction(
     [
       sqlInsert({
-        fields: ["name=identity_name", "enabled=identity_enabled"],
+        fields: ["id=identity_id", "enabled=identity_enabled"],
         table: "identity"
       })
     ]
       .concat(
         !user
           ? sqlInsert({
-              fields: ["sender", "primary_identity_name"],
+              fields: ["id=sender", "primary_identity_id"],
               table: "user"
             })
-          : "UPDATE user SET primary_identity_name=$primary_identity_name WHERE sender=$sender"
+          : "UPDATE user SET primary_identity_id=$primary_identity_id WHERE id=$sender"
       )
       .concat(
         sqlInsert({
-          fields: ["identity_name", "user_pubkey=sender", "membership_type"],
+          fields: ["identity_id", "user_id=sender", "membership_type"],
           table: "user_identity"
         })
       )
   ).run({
     identity_enabled: 1,
-    identity_name: id,
+    identity_id: identityId,
     membership_type: "ADMIN",
-    primary_identity_name: id,
+    primary_identity_id: identityId,
     sender
   });
 
   // Create home dir.
-  fs.ensureDirSync(path.join(dataDir, id));
+  fs.ensureDirSync(path.join(dataDir, identityId));
 
   return new Response(
-    `Your profile is now accessible at https://scuttle.space/${id}.`,
+    `Your profile is now accessible at https://scuttle.space/${identityId}.`,
     message.id
   );
 }

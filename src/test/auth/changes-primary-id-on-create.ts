@@ -20,10 +20,10 @@ export default function(msgSource: IMessageSource) {
     // the first user should not be primary
     {
       const rows = db
-        .prepare(`SELECT * FROM user WHERE sender="jeswins-sender"`)
+        .prepare(`SELECT * FROM user WHERE id="jeswins-user-id"`)
         .all();
       rows.length.should.equal(1);
-      rows[0].primary_identity_name.should.equal("jeswin2");
+      rows[0].primary_identity_id.should.equal("jeswin2");
     }
   };
 }

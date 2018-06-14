@@ -33,7 +33,7 @@ export default function(msgSource: IMessageSource) {
     {
       const db = await getDb();
       const rows = db
-        .prepare(`SELECT * FROM identity WHERE name="jeswin"`)
+        .prepare(`SELECT * FROM identity WHERE id="jeswin"`)
         .all();
       rows.length.should.equal(0);
     }
@@ -41,17 +41,17 @@ export default function(msgSource: IMessageSource) {
     {
       const db = await getDb();
       const rows = db
-        .prepare(`SELECT * FROM user WHERE sender="jeswins-sender"`)
+        .prepare(`SELECT * FROM user WHERE id="jeswins-user-id"`)
         .all();
       rows.length.should.equal(1);
-      shouldLib.not.exist(rows[0].primary_identity_name);
+      shouldLib.not.exist(rows[0].primary_identity_id);
     }
 
     {
       const db = await getDb();
       const rows = db
         .prepare(
-          `SELECT * FROM user_identity WHERE user_pubkey="jeswins-sender" AND identity_name="jeswin"`
+          `SELECT * FROM user_identity WHERE user_id="jeswins-user-id" AND identity_id="jeswin"`
         )
         .all();
       rows.length.should.equal(0);

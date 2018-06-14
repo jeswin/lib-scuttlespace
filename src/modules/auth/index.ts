@@ -3,9 +3,9 @@ import humanist, { IResult as IHumanistResult } from "humanist";
 import { getDb, sqlInsert } from "../../db";
 import Response from "../../Response";
 import { IMessage, IMessageSource } from "../../types";
-import alreadyTaken from "./already-taken";
 import createIdentity from "./create-identity";
 import modifyIdentity from "./modify-identity";
+import unavailableIdentity from "./unavailable-identity";
 
 export { default as setup } from "./setup";
 
@@ -62,17 +62,17 @@ export async function handle(
   const lcaseCommand = command.toLowerCase();
   if (lcaseCommand.startsWith("id ")) {
     const args: any = parser(command);
-    const identityName = args.id;
+    const identityId = args.id;
     const sender = message.sender;
-    if (isValidIdentity(identityName)) {
+    if (isValidIdentity(identityId)) {
       const identityStatus = await checkIdentityStatus(
-        identityName,
+        identityId,
         message.sender
       );
       return identityStatus.status === "AVAILABLE"
-        ? await createIdentity(identityName, sender, command, message)
+        ? await createIdentity(identityId, sender, command, message)
         : identityStatus.status === "TAKEN"
-          ? await alreadyTaken(identityName, sender, command, message)
+          ? await unavailableIdentity(identityId, sender, command, message)
           : await modifyIdentity(identityStatus, args, command, message);
     }
   }
@@ -86,10 +86,10 @@ function isValidIdentity(username: string) {
 export interface IExistingIdentityResult {
   status: "ADMIN" | "MEMBER";
   enabled: boolean;
-  identityName: string;
+  identityId: string;
   membershipType: string;
   primaryIdentityName: string;
-  sender: string;
+  userId: string;
 }
 
 export type IdentityStatusCheckResult =
@@ -98,7 +98,7 @@ export type IdentityStatusCheckResult =
   | { status: "TAKEN" };
 
 async function checkIdentityStatus(
-  identityName: string,
+  identityId: string,
   sender: string
 ): Promise<IdentityStatusCheckResult> {
   const db = await getDb();
@@ -107,28 +107,28 @@ async function checkIdentityStatus(
     .prepare(
       `SELECT
         i.enabled as enabled,
-        i.name as identityName,
+        i.id as identityId,
         ui.membership_type as membershipType,
-        u.primary_identity_name as primaryIdentityName,
-        u.sender as sender
+        u.primary_identity_id as primaryIdentityName,
+        u.id as userId
       FROM user_identity ui
-      JOIN identity i ON ui.identity_name = i.name
-      JOIN user u on ui.user_pubkey = u.sender
-      WHERE identity_name=$identityName`
+      JOIN identity i ON ui.identity_id = i.id
+      JOIN user u on ui.user_id = u.id
+      WHERE identity_id=$identity_id`
     )
-    .get({ identityName });
+    .get({ identity_id: identityId });
 
   if (!identity) {
     return { status: "AVAILABLE" };
   } else {
-    if (identity.sender === sender) {
+    if (identity.userId === sender) {
       return {
         enabled: identity.enabled,
-        identityName: identity.identityName,
+        identityId: identity.identityId,
         membershipType: identity.membershipType,
         primaryIdentityName: identity.primaryIdentityName,
-        sender,
-        status: identity.membershipType === "ADMIN" ? "ADMIN" : "MEMBER"
+        status: identity.membershipType,
+        userId: identity.userId
       };
     } else {
       return {
@@ -140,7 +140,7 @@ async function checkIdentityStatus(
 
 export async function didNotUnderstand(command: string, message: IMessage) {
   return new Response(
-    `Sorry I did not follow the instruction '${command}'. See https://scuttle.space/help.`,
+    `Sorry I did not follow the instruction '${command}'.`,
     message.id
   );
 }

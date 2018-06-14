@@ -4,7 +4,7 @@ export async function setup() {
   await createTable(
     "settings",
     `CREATE TABLE settings (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      rowid INTEGER PRIMARY KEY AUTOINCREMENT,
       key	TEXT NOT NULL,
       value	TEXT NOT NULL
     )`

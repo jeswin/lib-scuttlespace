@@ -1,5 +1,5 @@
-import { IMessageSource, IMessage } from "../../types";
-import { resetDb } from "../test";
+import { IMessage, IMessageSource } from "../../types";
+import { deleteEverything } from "../reset";
 import changesPrimaryIdOnCreate from "./changes-primary-id-on-create";
 import createUser from "./creates-user";
 import deletesId from "./deletes-id";
@@ -13,7 +13,7 @@ export function createMessage(msg: any): IMessage {
   const base = {
     id: "some-message-id",
     root: "some-root",
-    sender: "jeswins-sender",
+    sender: "jeswins-user-id",
     text: "hello world",
     timestamp: Date.now()
   };
@@ -23,7 +23,7 @@ export function createMessage(msg: any): IMessage {
 
 export default function run(msgSource: IMessageSource) {
   describe("auth", async () => {
-    beforeEach(async () => await resetDb());
+    beforeEach(deleteEverything);
 
     it("creates a user", createUser(msgSource));
 

@@ -26,30 +26,30 @@ export default function(msgSource: IMessageSource) {
     const db = await getDb();
     {
       const rows = db
-        .prepare(`SELECT * FROM identity WHERE name="jeswin"`)
+        .prepare(`SELECT * FROM identity WHERE id="jeswin"`)
         .all();
       rows.length.should.equal(1);
-      rows[0].name.should.equal("jeswin");
+      rows[0].id.should.equal("jeswin");
       rows[0].enabled.should.equal(1);
       shouldLib.not.exist(rows[0].domain);
     }
 
     {
       const rows = db
-        .prepare(`SELECT * FROM user WHERE sender="jeswins-sender"`)
+        .prepare(`SELECT * FROM user WHERE id="jeswins-user-id"`)
         .all();
       rows.length.should.equal(1);
-      rows[0].sender.should.equal("jeswins-sender");
-      rows[0].primary_identity_name.should.equal("jeswin");
+      rows[0].id.should.equal("jeswins-user-id");
+      rows[0].primary_identity_id.should.equal("jeswin");
     }
 
     {
       const rows = db
-        .prepare(`SELECT * FROM user_identity WHERE identity_name="jeswin"`)
+        .prepare(`SELECT * FROM user_identity WHERE identity_id="jeswin"`)
         .all();
       rows.length.should.equal(1);
-      rows[0].identity_name.should.equal("jeswin");
-      rows[0].user_pubkey.should.equal("jeswins-sender");
+      rows[0].identity_id.should.equal("jeswin");
+      rows[0].user_id.should.equal("jeswins-user-id");
       rows[0].membership_type.should.equal("ADMIN");
     }
 

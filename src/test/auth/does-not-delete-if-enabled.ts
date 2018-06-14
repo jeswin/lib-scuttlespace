@@ -29,7 +29,7 @@ export default function(msgSource: IMessageSource) {
     {
       const db = await getDb();
       const rows = db
-        .prepare(`SELECT * FROM identity WHERE name="jeswin"`)
+        .prepare(`SELECT * FROM identity WHERE id="jeswin"`)
         .all();
       rows.length.should.equal(1);
 

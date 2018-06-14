@@ -1,12 +1,8 @@
 import "mocha";
 import "should";
 
-import fs = require("fs-extra");
-
 import * as config from "../config";
 import * as db from "../db";
-import init from "../init";
-import { setConsoleLogging } from "../logger";
 import { IMessageSource } from "../types";
 import auth from "./auth";
 
@@ -46,25 +42,5 @@ function createMockMessageSource(): IMessageSource {
 const msgSource = createMockMessageSource();
 
 describe("scuttlespace", async () => {
-  before(async () => {
-    if (fs.existsSync(config.dataDir)) {
-      fs.removeSync(config.dataDir);
-      fs.mkdirSync(config.dataDir);
-    }
-
-    if (fs.existsSync(config.dbDir)) {
-      fs.removeSync(config.dbDir);
-      fs.mkdirSync(config.dbDir);
-    }
-  });
   await auth(msgSource);
 });
-
-export async function resetDb() {
-  setConsoleLogging(false);
-  if (fs.existsSync(dbName)) {
-    fs.unlinkSync(dbName);
-  }
-  db.resetDb();
-  await init();
-}
