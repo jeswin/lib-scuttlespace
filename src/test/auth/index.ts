@@ -8,6 +8,7 @@ import doesNotDeleteIfEnabled from "./does-not-delete-if-enabled";
 import enablesId from "./enables-id";
 import setsCustomDomain from "./sets-custom-domain";
 import switchPrimaryId from "./switches-primary-id";
+import addAdmin from "./add-admin";
 
 export function createMessage(msg: any): IMessage {
   const base = {
@@ -43,5 +44,7 @@ export default function run(msgSource: IMessageSource) {
     it("does not deletes if id is enabled", doesNotDeleteIfEnabled(msgSource));
 
     it("sets a custom domain", setsCustomDomain(msgSource));
+
+    it("adds an admin", addAdmin(msgSource));
   });
 }

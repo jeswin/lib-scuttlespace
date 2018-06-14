@@ -51,7 +51,7 @@ export default async function createIdentity(
   fs.ensureDirSync(path.join(dataDir, identityId));
 
   return new Response(
-    `Your profile is now accessible at https://scuttle.space/${identityId}.`,
+    `The id '${identityId}' is now accessible at https://scuttle.space/${identityId}.`,
     message.id
   );
 }

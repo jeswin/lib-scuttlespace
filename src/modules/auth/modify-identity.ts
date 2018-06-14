@@ -4,7 +4,7 @@ import * as path from "path";
 
 import { didNotUnderstand, IExistingIdentityResult } from ".";
 import { dataDir } from "../../config";
-import { getDb } from "../../db";
+import { getDb, sqlInsert } from "../../db";
 import Response from "../../Response";
 import { IMessage } from "../../types";
 
@@ -150,18 +150,37 @@ async function addAdmin(
   args: any,
   message: IMessage
 ) {
-  const { identityId, membershipType } = idRow;
+  const { identityId, userId, membershipType } = idRow;
   if (membershipType === "ADMIN") {
     const db = await getDb();
 
-    const membership = db.prepare("SELECT * FROM membership WHERE ");
+    const membership = db
+      .prepare(
+        "SELECT * FROM membership WHERE identity_id=$identity_id AND user_id=new_user_id"
+      )
+      .get({ identity_id: identityId, new_user_id: args.admin });
 
-    db.prepare("UPDATE identity SET domain=$domain WHERE id=$identity_id").run({
-      domain: args.domain,
-      identity_id: identityId
-    });
+    if (membership) {
+      if (membership.membership_type !== "ADMIN") {
+        db.prepare(
+          "UPDATE membership SET membership_type='ADMIN' WHERE identity_id=$identity_id AND user_id=new_user_id"
+        ).run({ identity_id: identityId, new_user_id: args.admin });
+      }
+    } else {
+      db.prepare(
+        sqlInsert({
+          fields: ["identity_id", "user_id=new_user_id", "membership_type"],
+          table: "membership"
+        })
+      ).run({
+        identity_id: identityId,
+        membership_type: "ADMIN",
+        new_user_id: args.admin
+      });
+    }
+
     return new Response(
-      `The id '${identityId}' is now accessible at ${args.domain}.`,
+      `The user ${args.admin} is now an admin for the id '${identityId}'.`,
       message.id
     );
   } else {

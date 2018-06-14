@@ -12,14 +12,14 @@ const shouldLib = require("should");
 export default function(msgSource: IMessageSource) {
   return async () => {
     const command = "id jeswin";
-    const message = createMessage({ text: `@scuttlespace ${command}` });
+    const message = createMessage({ text: `${command}` });
     const reply = await handle(command, message, msgSource);
 
     shouldLib.exist(reply);
     const _ =
       reply &&
       reply.message.should.equal(
-        "Your profile is now accessible at https://scuttle.space/jeswin."
+        "The id 'jeswin' is now accessible at https://scuttle.space/jeswin."
       );
 
     // db

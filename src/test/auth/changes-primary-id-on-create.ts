@@ -8,11 +8,11 @@ const shouldLib = require("should");
 export default function(msgSource: IMessageSource) {
   return async () => {
     const command1 = "id jeswin1";
-    const message1 = createMessage({ text: `@scuttlespace ${command1}` });
+    const message1 = createMessage({ text: command1 });
     const reply1 = await handle(command1, message1, msgSource);
 
     const command2 = "id jeswin2";
-    const message2 = createMessage({ text: `@scuttlespace ${command2}` });
+    const message2 = createMessage({ text: command2 });
     const reply2 = await handle(command2, message2, msgSource);
 
     const db = await getDb();
