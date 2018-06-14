@@ -26,9 +26,9 @@ export default async function modifyIdentity(
     } else if (args.domain) {
       return await setCustomDomain(idRow, args, message);
     } else if (args.admin) {
-      return await setCustomDomain(idRow, args, message);
+      return await addMembership(idRow, args, args.admin, "ADMIN", message);
     } else if (args.user) {
-      return await setCustomDomain(idRow, args, message);
+      return await addMembership(idRow, args, args.user, "USER", message);
     } else if (args.remove) {
       return await setCustomDomain(idRow, args, message);
     } else {
@@ -145,26 +145,28 @@ async function setCustomDomain(
   }
 }
 
-async function addAdmin(
+async function addMembership(
   idRow: IExistingIdentityResult,
   args: any,
+  memberName: string,
+  userMembershipType: string,
   message: IMessage
 ) {
   const { identityId, userId, membershipType } = idRow;
-  if (membershipType === "ADMIN") {
+  if (membershipType === userMembershipType) {
     const db = await getDb();
 
     const membership = db
       .prepare(
-        "SELECT * FROM membership WHERE identity_id=$identity_id AND user_id=new_user_id"
+        "SELECT * FROM membership WHERE identity_id=$identity_id AND user_id=$new_user_id"
       )
-      .get({ identity_id: identityId, new_user_id: args.admin });
+      .get({ identity_id: identityId, new_user_id: memberName });
 
     if (membership) {
-      if (membership.membership_type !== "ADMIN") {
+      if (membership.membership_type !== userMembershipType) {
         db.prepare(
-          "UPDATE membership SET membership_type='ADMIN' WHERE identity_id=$identity_id AND user_id=new_user_id"
-        ).run({ identity_id: identityId, new_user_id: args.admin });
+          `UPDATE membership SET membership_type='${userMembershipType}' WHERE identity_id=$identity_id AND user_id=$new_user_id`
+        ).run({ identity_id: identityId, new_user_id: memberName });
       }
     } else {
       db.prepare(
@@ -174,13 +176,15 @@ async function addAdmin(
         })
       ).run({
         identity_id: identityId,
-        membership_type: "ADMIN",
-        new_user_id: args.admin
+        membership_type: userMembershipType,
+        new_user_id: memberName
       });
     }
 
     return new Response(
-      `The user ${args.admin} is now an admin for the id '${identityId}'.`,
+      userMembershipType === "ADMIN"
+        ? `The user ${memberName} is now an admin of '${identityId}'.`
+        : `The user ${memberName} is now a member of '${identityId}'.`,
       message.id
     );
   } else {
