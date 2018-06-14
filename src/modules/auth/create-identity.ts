@@ -1,4 +1,6 @@
 import * as fs from "fs-extra";
+import * as path from "path";
+import { dataDir, dbDir } from "../../config";
 import { getDb, sqlInsert } from "../../db";
 
 export default async function createIdentity(
@@ -43,7 +45,7 @@ export default async function createIdentity(
   });
 
   // Create home dir.
-  fs.ensureDirSync(`data/${id}`);
+  fs.ensureDirSync(path.join(dataDir, id));
 
   return {
     message: `Your profile is now accessible at https://scuttle.space/${id}.`

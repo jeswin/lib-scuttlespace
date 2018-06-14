@@ -1,5 +1,8 @@
 import fs = require("fs-extra");
+import * as path from "path";
+
 import { createMessage } from ".";
+import { dataDir } from "../../config";
 import { getDb } from "../../db";
 import { handle } from "../../modules/auth";
 import { IMessageSource } from "../../types";
@@ -54,6 +57,6 @@ export default function(msgSource: IMessageSource) {
       rows.length.should.equal(0);
     }
 
-    fs.existsSync("data/jeswin").should.be.false();
+    fs.existsSync(path.join(dataDir, "jeswin")).should.be.false();
   };
 }

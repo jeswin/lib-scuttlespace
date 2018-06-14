@@ -1,4 +1,6 @@
+import * as path from "path";
 import winston = require("winston");
+import * as config from "./config";
 
 let logger: winston.Logger;
 export async function init() {
@@ -10,8 +12,13 @@ export async function init() {
       // - Write to all logs with level `info` and below to `combined.log`
       // - Write all logs error (and below) to `error.log`.
       //
-      new winston.transports.File({ filename: "error.log", level: "error" }),
-      new winston.transports.File({ filename: "combined.log" })
+      new winston.transports.File({
+        filename: path.join(config.logsDir, "error.log"),
+        level: "error"
+      }),
+      new winston.transports.File({
+        filename: path.join(config.logsDir, "combined.log")
+      })
     ]
   });
 

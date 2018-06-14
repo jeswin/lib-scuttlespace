@@ -1,5 +1,8 @@
 import fs = require("fs");
+import * as path from "path";
+
 import { createMessage } from ".";
+import { dataDir } from "../../config";
 import { getDb } from "../../db";
 import { handle } from "../../modules/auth";
 import { IMessageSource } from "../../types";
@@ -20,7 +23,7 @@ export default function(msgSource: IMessageSource) {
       );
 
     // db
-    const db = await getDb();    
+    const db = await getDb();
     {
       const rows = db
         .prepare(`SELECT * FROM identity WHERE name="jeswin"`)
@@ -51,6 +54,6 @@ export default function(msgSource: IMessageSource) {
     }
 
     // file system
-    fs.existsSync(`data/jeswin`).should.be.true();
+    fs.existsSync(path.join(dataDir, "jeswin")).should.be.true();
   };
 }

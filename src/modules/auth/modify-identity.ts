@@ -1,6 +1,9 @@
 import * as fs from "fs-extra";
 import { IResult as IHumanistResult } from "humanist";
+import * as path from "path";
+
 import { didNotUnderstand, IExistingIdentityResult } from ".";
+import { dataDir } from "../../config";
 import { getDb } from "../../db";
 
 export default async function modifyIdentity(
@@ -83,7 +86,7 @@ async function destroyId(idRow: IExistingIdentityResult, args: any) {
           WHERE primary_identity_name=$identityName`
       ]).run({ identityName });
 
-      fs.rmdirSync(`data/${identityName}`);
+      fs.rmdirSync(path.join(dataDir, identityName));
 
       return {
         message: `The id ${identityName} was deleted. Everything is gone.`

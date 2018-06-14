@@ -23,9 +23,5 @@ node_modules
 .lock-wscript
 
 dist/*
-!db/placeholder
-db/*
-!data/placeholder
-data/*
 
 .DS_Store
