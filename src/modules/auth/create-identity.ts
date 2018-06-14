@@ -7,7 +7,7 @@ import { IMessage } from "../../types";
 
 export default async function createIdentity(
   id: string,
-  pubkey: string,
+  sender: string,
   command: string,
   message: IMessage
 ) {
@@ -15,8 +15,8 @@ export default async function createIdentity(
 
   // See if the user already exists.
   const user = db
-    .prepare(`SELECT * FROM user WHERE pubkey=$pubkey`)
-    .get({ pubkey });
+    .prepare(`SELECT * FROM user WHERE sender=$sender`)
+    .get({ sender });
 
   db.transaction(
     [
@@ -28,14 +28,14 @@ export default async function createIdentity(
       .concat(
         !user
           ? sqlInsert({
-              fields: ["pubkey", "primary_identity_name"],
+              fields: ["sender", "primary_identity_name"],
               table: "user"
             })
-          : "UPDATE user SET primary_identity_name=$primary_identity_name WHERE pubkey=$pubkey"
+          : "UPDATE user SET primary_identity_name=$primary_identity_name WHERE sender=$sender"
       )
       .concat(
         sqlInsert({
-          fields: ["identity_name", "user_pubkey=pubkey", "membership_type"],
+          fields: ["identity_name", "user_pubkey=sender", "membership_type"],
           table: "user_identity"
         })
       )
@@ -44,7 +44,7 @@ export default async function createIdentity(
     identity_name: id,
     membership_type: "ADMIN",
     primary_identity_name: id,
-    pubkey
+    sender
   });
 
   // Create home dir.

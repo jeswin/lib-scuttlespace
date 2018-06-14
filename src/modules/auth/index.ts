@@ -12,7 +12,7 @@ export { default as setup } from "./setup";
 /*
   Supported commands
   
-  A given pubkey can have multiple usernames associated with it, one of which will be in is_primary state.
+  A given sender can have multiple usernames associated with it, one of which will be in is_primary state.
 
   Account Management
   ------------------
@@ -63,16 +63,16 @@ export async function handle(
   if (lcaseCommand.startsWith("id ")) {
     const args: any = parser(command);
     const identityName = args.id;
-    const pubkey = message.sender;
+    const sender = message.sender;
     if (isValidIdentity(identityName)) {
       const identityStatus = await checkIdentityStatus(
         identityName,
         message.sender
       );
       return identityStatus.status === "AVAILABLE"
-        ? await createIdentity(identityName, pubkey, command, message)
+        ? await createIdentity(identityName, sender, command, message)
         : identityStatus.status === "TAKEN"
-          ? await alreadyTaken(identityName, pubkey, command, message)
+          ? await alreadyTaken(identityName, sender, command, message)
           : await modifyIdentity(identityStatus, args, command, message);
     }
   }
@@ -89,7 +89,7 @@ export interface IExistingIdentityResult {
   identityName: string;
   membershipType: string;
   primaryIdentityName: string;
-  pubkey: string;
+  sender: string;
 }
 
 export type IdentityStatusCheckResult =
@@ -99,7 +99,7 @@ export type IdentityStatusCheckResult =
 
 async function checkIdentityStatus(
   identityName: string,
-  pubkey: string
+  sender: string
 ): Promise<IdentityStatusCheckResult> {
   const db = await getDb();
 
@@ -110,10 +110,10 @@ async function checkIdentityStatus(
         i.name as identityName,
         ui.membership_type as membershipType,
         u.primary_identity_name as primaryIdentityName,
-        u.pubkey as pubkey
+        u.sender as sender
       FROM user_identity ui
       JOIN identity i ON ui.identity_name = i.name
-      JOIN user u on ui.user_pubkey = u.pubkey
+      JOIN user u on ui.user_pubkey = u.sender
       WHERE identity_name=$identityName`
     )
     .get({ identityName });
@@ -121,13 +121,13 @@ async function checkIdentityStatus(
   if (!identity) {
     return { status: "AVAILABLE" };
   } else {
-    if (identity.pubkey === pubkey) {
+    if (identity.sender === sender) {
       return {
         enabled: identity.enabled,
         identityName: identity.identityName,
         membershipType: identity.membershipType,
         primaryIdentityName: identity.primaryIdentityName,
-        pubkey,
+        sender,
         status: identity.membershipType === "ADMIN" ? "ADMIN" : "MEMBER"
       };
     } else {

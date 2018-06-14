@@ -3,7 +3,7 @@ import Response from "../../Response";
 
 export default async function alreadyTaken(
   identityName: string,
-  pubkey: string,
+  sender: string,
   command: string,
   message: IMessage
 ) {

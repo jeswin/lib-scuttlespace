@@ -1,5 +1,5 @@
-export async function getSession(pubkey: string) {
+export async function getSession(sender: string) {
   return {};
 }
 
-export async function getState(pubkey: string) {}
+export async function getState(sender: string) {}

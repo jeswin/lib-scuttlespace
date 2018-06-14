@@ -20,13 +20,13 @@ export default async function setup() {
     "user",
     `CREATE TABLE user ( 
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        pubkey TEXT NOT NULL,
+        sender TEXT NOT NULL,
         primary_identity_name TEXT,
-        CONSTRAINT unique_user_pubkey UNIQUE (pubkey)
+        CONSTRAINT unique_user_pubkey UNIQUE (sender)
       )`
   );
 
-  await createIndexes("user", ["pubkey"]);
+  await createIndexes("user", ["sender"]);
   await createIndexes("user", ["primary_identity_name"]);
 
   await createTable(
@@ -37,7 +37,7 @@ export default async function setup() {
         user_pubkey TEXT NOT NULL,
         membership_type INTEGER NOT NULL,
         FOREIGN KEY(identity_name) REFERENCES identity(name),
-        FOREIGN KEY(user_pubkey) REFERENCES user(pubkey)
+        FOREIGN KEY(user_pubkey) REFERENCES user(sender)
       )`
   );
 

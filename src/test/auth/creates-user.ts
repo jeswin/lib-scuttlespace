@@ -36,10 +36,10 @@ export default function(msgSource: IMessageSource) {
 
     {
       const rows = db
-        .prepare(`SELECT * FROM user WHERE pubkey="jeswins-pubkey"`)
+        .prepare(`SELECT * FROM user WHERE sender="jeswins-sender"`)
         .all();
       rows.length.should.equal(1);
-      rows[0].pubkey.should.equal("jeswins-pubkey");
+      rows[0].sender.should.equal("jeswins-sender");
       rows[0].primary_identity_name.should.equal("jeswin");
     }
 
@@ -49,7 +49,7 @@ export default function(msgSource: IMessageSource) {
         .all();
       rows.length.should.equal(1);
       rows[0].identity_name.should.equal("jeswin");
-      rows[0].user_pubkey.should.equal("jeswins-pubkey");
+      rows[0].user_pubkey.should.equal("jeswins-sender");
       rows[0].membership_type.should.equal("ADMIN");
     }
 

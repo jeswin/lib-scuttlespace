@@ -40,13 +40,13 @@ async function switchPrimaryId(
   args: any,
   message: IMessage
 ) {
-  const { identityName, pubkey } = idRow;
+  const { identityName, sender } = idRow;
   const db = await getDb();
 
   // deactivate the rest
   db.prepare(
-    "UPDATE user SET primary_identity_name=$identityName WHERE pubkey=$pubkey"
-  ).run({ identityName, pubkey });
+    "UPDATE user SET primary_identity_name=$identityName WHERE sender=$sender"
+  ).run({ identityName, sender });
 
   return new Response(`Switched to ${identityName}.`, message.id);
 }

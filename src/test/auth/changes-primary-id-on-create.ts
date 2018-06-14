@@ -20,7 +20,7 @@ export default function(msgSource: IMessageSource) {
     // the first user should not be primary
     {
       const rows = db
-        .prepare(`SELECT * FROM user WHERE pubkey="jeswins-pubkey"`)
+        .prepare(`SELECT * FROM user WHERE sender="jeswins-sender"`)
         .all();
       rows.length.should.equal(1);
       rows[0].primary_identity_name.should.equal("jeswin2");

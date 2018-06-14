@@ -1,4 +1,4 @@
-import { IMessageSource } from "../../types";
+import { IMessageSource, IMessage } from "../../types";
 import { resetDb } from "../test";
 import changesPrimaryIdOnCreate from "./changes-primary-id-on-create";
 import createUser from "./creates-user";
@@ -9,17 +9,13 @@ import enablesId from "./enables-id";
 import setsCustomDomain from "./sets-custom-domain";
 import switchPrimaryId from "./switches-primary-id";
 
-export function createMessage(msg: any) {
+export function createMessage(msg: any): IMessage {
   const base = {
-    author: "jeswins-pubkey",
-    branch: "some-branch",
-    channel: "some-channel",
-    key: "some-message-key",
-    mentions: ["alice", "bob"],
+    id: "some-message-id",
     root: "some-root",
+    sender: "jeswins-sender",
     text: "hello world",
-    timestamp: Date.now(),
-    type: "post"
+    timestamp: Date.now()
   };
 
   return { ...base, ...msg };

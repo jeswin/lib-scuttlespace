@@ -23,9 +23,9 @@ export async function init() {
   }
 }
 
-async function loadState(pubkey: string) {}
+async function loadState(sender: string) {}
 
-async function saveState(state: any, pubkey: string) {}
+async function saveState(state: any, sender: string) {}
 
 export interface IHandlerResponse {
   message?: string;
