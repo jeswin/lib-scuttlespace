@@ -30,7 +30,7 @@ export default async function modifyIdentity(
     } else if (args.user) {
       return await addMembership(idRow, args, args.user, "USER", message);
     } else if (args.remove) {
-      return await setCustomDomain(idRow, args, message);
+      return await removeMembership(idRow, args, args.remove, message);
     } else {
       return await didNotUnderstand(command, message);
     }
@@ -153,7 +153,7 @@ async function addMembership(
   message: IMessage
 ) {
   const { identityId, userId, membershipType } = idRow;
-  if (membershipType === userMembershipType) {
+  if (membershipType === "ADMIN") {
     const db = await getDb();
 
     const membership = db
@@ -183,8 +183,8 @@ async function addMembership(
 
     return new Response(
       userMembershipType === "ADMIN"
-        ? `The user ${memberName} is now an admin of '${identityId}'.`
-        : `The user ${memberName} is now a member of '${identityId}'.`,
+        ? `${memberName} is now an admin of ${identityId}.`
+        : `${memberName} is now a member of ${identityId}.`,
       message.id
     );
   } else {
@@ -192,9 +192,37 @@ async function addMembership(
   }
 }
 
+async function removeMembership(
+  idRow: IExistingIdentityResult,
+  args: any,
+  memberName: string,
+  message: IMessage
+) {
+  const { identityId, userId, membershipType } = idRow;
+  if (membershipType === "ADMIN") {
+    if (memberName === userId) {
+      return new Response(
+        `Cannot remove oneself from ${identityId}.`,
+        message.id
+      );
+    } else {
+      const db = await getDb();
+      db.prepare(
+        "DELETE FROM membership WHERE identity_id=$identity_id AND user_id=$new_user_id"
+      ).run({ identity_id: identityId, new_user_id: memberName });
+      return new Response(
+        `${memberName} was removed from ${identityId}.`,
+        message.id
+      );
+    }
+  } else {
+    return needToBeAnAdmin(identityId, message);
+  }
+}
+
 function needToBeAnAdmin(identityId: string, message: IMessage) {
   return new Response(
-    `You don't have permissions to update the id '${identityId}'. Need to be an admin.`,
+    `You don't have permissions to update the membership of '${identityId}'. Need to be an admin.`,
     message.id
   );
 }

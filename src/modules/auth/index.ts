@@ -50,7 +50,7 @@ const parser = humanist([
   ["destroy", 0],
   ["domain", 1],
   ["admin", 1],
-  ["member", 1],
+  ["user", 1],
   ["remove", 1]
 ]);
 
