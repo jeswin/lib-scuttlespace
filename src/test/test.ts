@@ -1,7 +1,7 @@
 import "mocha";
 import "should";
 
-import fs = require("fs");
+import fs = require("fs-extra");
 
 import * as config from "../config";
 import * as db from "../db";
@@ -48,12 +48,12 @@ const msgSource = createMockMessageSource();
 describe("scuttlespace", async () => {
   before(async () => {
     if (fs.existsSync(config.dataDir)) {
-      fs.rmdirSync(config.dataDir);
+      fs.removeSync(config.dataDir);
       fs.mkdirSync(config.dataDir);
     }
 
     if (fs.existsSync(config.dbDir)) {
-      fs.rmdirSync(config.dbDir);
+      fs.removeSync(config.dbDir);
       fs.mkdirSync(config.dbDir);
     }
   });
