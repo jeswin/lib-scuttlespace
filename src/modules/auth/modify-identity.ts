@@ -106,7 +106,7 @@ async function destroyId(
     } else {
       const db = await getDb();
       db.transaction([
-        `DELETE FROM user_identity WHERE identity_id=$identity_id`,
+        `DELETE FROM membership WHERE identity_id=$identity_id`,
         `DELETE FROM identity WHERE id=$identity_id`,
         `UPDATE user SET primary_identity_id=null 
           WHERE primary_identity_id=$identity_id`
@@ -154,7 +154,7 @@ async function addAdmin(
   if (membershipType === "ADMIN") {
     const db = await getDb();
 
-    db.prepare("SELECT * FROM user_identity WHERE ");
+    const membership = db.prepare("SELECT * FROM membership WHERE ");
 
     db.prepare("UPDATE identity SET domain=$domain WHERE id=$identity_id").run({
       domain: args.domain,

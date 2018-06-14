@@ -36,7 +36,7 @@ export default async function createIdentity(
       .concat(
         sqlInsert({
           fields: ["identity_id", "user_id=sender", "membership_type"],
-          table: "user_identity"
+          table: "membership"
         })
       )
   ).run({

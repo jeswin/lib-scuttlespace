@@ -45,7 +45,7 @@ export default function(msgSource: IMessageSource) {
 
     {
       const rows = db
-        .prepare(`SELECT * FROM user_identity WHERE identity_id="jeswin"`)
+        .prepare(`SELECT * FROM membership WHERE identity_id="jeswin"`)
         .all();
       rows.length.should.equal(1);
       rows[0].identity_id.should.equal("jeswin");

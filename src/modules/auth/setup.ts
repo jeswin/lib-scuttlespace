@@ -30,8 +30,8 @@ export default async function setup() {
   await createIndexes("user", ["primary_identity_id"]);
 
   await createTable(
-    "user_identity",
-    `CREATE TABLE user_identity ( 
+    "membership",
+    `CREATE TABLE membership ( 
         rowid INTEGER PRIMARY KEY AUTOINCREMENT,
         identity_id TEXT NOT NULL,
         user_id TEXT NOT NULL,
@@ -41,7 +41,7 @@ export default async function setup() {
       )`
   );
 
-  await createIndexes("user_identity", ["identity_id"]);
-  await createIndexes("user_identity", ["user_id"]);
-  await createIndexes("user_identity", ["identity_id", "user_id"]);
+  await createIndexes("membership", ["identity_id"]);
+  await createIndexes("membership", ["user_id"]);
+  await createIndexes("membership", ["identity_id", "user_id"]);
 }

@@ -111,7 +111,7 @@ async function checkIdentityStatus(
         ui.membership_type as membershipType,
         u.primary_identity_id as primaryIdentityName,
         u.id as userId
-      FROM user_identity ui
+      FROM membership ui
       JOIN identity i ON ui.identity_id = i.id
       JOIN user u on ui.user_id = u.id
       WHERE identity_id=$identity_id`

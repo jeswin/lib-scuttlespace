@@ -51,7 +51,7 @@ export default function(msgSource: IMessageSource) {
       const db = await getDb();
       const rows = db
         .prepare(
-          `SELECT * FROM user_identity WHERE user_id="jeswins-user-id" AND identity_id="jeswin"`
+          `SELECT * FROM membership WHERE user_id="jeswins-user-id" AND identity_id="jeswin"`
         )
         .all();
       rows.length.should.equal(0);
