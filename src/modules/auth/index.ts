@@ -1,7 +1,8 @@
 import humanist, { IResult as IHumanistResult } from "humanist";
 
 import { getDb, sqlInsert } from "../../db";
-import { IMessage, IMessageSource, IReply } from "../../types";
+import Response from "../../Response";
+import { IMessage, IMessageSource } from "../../types";
 import alreadyTaken from "./already-taken";
 import createIdentity from "./create-identity";
 import modifyIdentity from "./modify-identity";
@@ -57,22 +58,22 @@ export async function handle(
   command: string,
   message: IMessage,
   msgSource: IMessageSource
-): Promise<IReply | undefined> {
+): Promise<Response | undefined> {
   const lcaseCommand = command.toLowerCase();
   if (lcaseCommand.startsWith("id ")) {
     const args: any = parser(command);
     const identityName = args.id;
-    const pubkey = message.author;
+    const pubkey = message.sender;
     if (isValidIdentity(identityName)) {
       const identityStatus = await checkIdentityStatus(
         identityName,
-        message.author
+        message.sender
       );
       return identityStatus.status === "AVAILABLE"
-        ? await createIdentity(identityName, pubkey, command)
+        ? await createIdentity(identityName, pubkey, command, message)
         : identityStatus.status === "TAKEN"
-          ? await alreadyTaken(identityName, pubkey, command)
-          : await modifyIdentity(identityStatus, args, command);
+          ? await alreadyTaken(identityName, pubkey, command, message)
+          : await modifyIdentity(identityStatus, args, command, message);
     }
   }
 }
@@ -137,8 +138,9 @@ async function checkIdentityStatus(
   }
 }
 
-export async function didNotUnderstand(command: string) {
-  return {
-    message: `Sorry I did not follow the instruction '${command}'. See https://scuttle.space/help.`
-  };
+export async function didNotUnderstand(command: string, message: IMessage) {
+  return new Response(
+    `Sorry I did not follow the instruction '${command}'. See https://scuttle.space/help.`,
+    message.id
+  );
 }

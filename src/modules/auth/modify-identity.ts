@@ -5,25 +5,28 @@ import * as path from "path";
 import { didNotUnderstand, IExistingIdentityResult } from ".";
 import { dataDir } from "../../config";
 import { getDb } from "../../db";
+import Response from "../../Response";
+import { IMessage } from "../../types";
 
 export default async function modifyIdentity(
   idRow: IExistingIdentityResult,
   args: any,
-  command: string
+  command: string,
+  message: IMessage
 ) {
   if (isJustUsername(args)) {
-    return await switchPrimaryId(idRow, args);
+    return await switchPrimaryId(idRow, args, message);
   } else {
     if (args.disable) {
-      return await disableId(idRow, args);
+      return await disableId(idRow, args, message);
     } else if (args.enable) {
-      return await enableId(idRow, args);
+      return await enableId(idRow, args, message);
     } else if (args.destroy) {
-      return await destroyId(idRow, args);
+      return await destroyId(idRow, args, message);
     } else if (args.domain) {
-      return await setCustomDomain(idRow, args);
+      return await setCustomDomain(idRow, args, message);
     } else {
-      return await didNotUnderstand(command);
+      return await didNotUnderstand(command, message);
     }
   }
 }
@@ -32,7 +35,11 @@ function isJustUsername(args: IHumanistResult) {
   return Object.keys(args).length === 2;
 }
 
-async function switchPrimaryId(idRow: IExistingIdentityResult, args: any) {
+async function switchPrimaryId(
+  idRow: IExistingIdentityResult,
+  args: any,
+  message: IMessage
+) {
   const { identityName, pubkey } = idRow;
   const db = await getDb();
 
@@ -41,42 +48,58 @@ async function switchPrimaryId(idRow: IExistingIdentityResult, args: any) {
     "UPDATE user SET primary_identity_name=$identityName WHERE pubkey=$pubkey"
   ).run({ identityName, pubkey });
 
-  return { message: `Switched to ${identityName}.` };
+  return new Response(`Switched to ${identityName}.`, message.id);
 }
 
-async function disableId(idRow: IExistingIdentityResult, args: any) {
+async function disableId(
+  idRow: IExistingIdentityResult,
+  args: any,
+  message: IMessage
+) {
   const { identityName, membershipType } = idRow;
   if (membershipType === "ADMIN") {
     const db = await getDb();
     db.prepare("UPDATE identity SET enabled=0 WHERE name=$identityName").run({
       identityName
     });
-    return { message: `The id ${identityName} was disabled.` };
+    return new Response(`The id ${identityName} was disabled.`, message.id);
   } else {
-    return needToBeAnAdmin(identityName);
+    return needToBeAnAdmin(identityName, message);
   }
 }
 
-async function enableId(idRow: IExistingIdentityResult, args: any) {
+async function enableId(
+  idRow: IExistingIdentityResult,
+  args: any,
+  message: IMessage
+) {
   const { identityName, membershipType } = idRow;
   if (membershipType === "ADMIN") {
     const db = await getDb();
     db.prepare("UPDATE identity SET enabled=1 WHERE name=$identityName").run({
       identityName
     });
-    return { message: `The id ${identityName} was enabled again.` };
+    return new Response(
+      `The id ${identityName} was enabled again.`,
+      message.id
+    );
   } else {
-    return needToBeAnAdmin(identityName);
+    return needToBeAnAdmin(identityName, message);
   }
 }
 
-async function destroyId(idRow: IExistingIdentityResult, args: any) {
+async function destroyId(
+  idRow: IExistingIdentityResult,
+  args: any,
+  message: IMessage
+) {
   const { identityName, membershipType, enabled } = idRow;
   if (membershipType === "ADMIN") {
     if (enabled) {
-      return {
-        message: `You may only delete a disabled id. Try 'id ${identityName} disable' first.`
-      };
+      return new Response(
+        `You may only delete a disabled id. Try 'id ${identityName} disable' first.`,
+        message.id
+      );
     } else {
       const db = await getDb();
       db.transaction([
@@ -88,16 +111,21 @@ async function destroyId(idRow: IExistingIdentityResult, args: any) {
 
       fs.rmdirSync(path.join(dataDir, identityName));
 
-      return {
-        message: `The id ${identityName} was deleted. Everything is gone.`
-      };
+      return new Response(
+        `The id ${identityName} was deleted. Everything is gone.`,
+        message.id
+      );
     }
   } else {
-    return needToBeAnAdmin(identityName);
+    return needToBeAnAdmin(identityName, message);
   }
 }
 
-async function setCustomDomain(idRow: IExistingIdentityResult, args: any) {
+async function setCustomDomain(
+  idRow: IExistingIdentityResult,
+  args: any,
+  message: IMessage
+) {
   const { identityName, membershipType } = idRow;
   if (membershipType === "ADMIN") {
     const db = await getDb();
@@ -105,16 +133,18 @@ async function setCustomDomain(idRow: IExistingIdentityResult, args: any) {
       domain: args.domain,
       name: identityName
     });
-    return {
-      message: `The id '${identityName}' is now accessible at ${args.domain}.`
-    };
+    return new Response(
+      `The id '${identityName}' is now accessible at ${args.domain}.`,
+      message.id
+    );
   } else {
-    return needToBeAnAdmin(identityName);
+    return needToBeAnAdmin(identityName, message);
   }
 }
 
-function needToBeAnAdmin(identityName: string) {
-  return {
-    message: `You don't have permissions to update the id '${identityName}'. Need to be an admin.`
-  };
+function needToBeAnAdmin(identityName: string, message: IMessage) {
+  return new Response(
+    `You don't have permissions to update the id '${identityName}'. Need to be an admin.`,
+    message.id
+  );
 }

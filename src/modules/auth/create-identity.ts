@@ -2,11 +2,14 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import { dataDir, dbDir } from "../../config";
 import { getDb, sqlInsert } from "../../db";
+import Response from "../../Response";
+import { IMessage } from "../../types";
 
 export default async function createIdentity(
   id: string,
   pubkey: string,
-  command: string
+  command: string,
+  message: IMessage
 ) {
   const db = await getDb();
 
@@ -47,7 +50,8 @@ export default async function createIdentity(
   // Create home dir.
   fs.ensureDirSync(path.join(dataDir, id));
 
-  return {
-    message: `Your profile is now accessible at https://scuttle.space/${id}.`
-  };
+  return new Response(
+    `Your profile is now accessible at https://scuttle.space/${id}.`,
+    message.id
+  );
 }

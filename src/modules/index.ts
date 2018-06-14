@@ -1,3 +1,4 @@
+import Response from "../Response";
 import { IMessage, IMessageSource } from "../types";
 import * as auth from "./auth";
 
@@ -34,18 +35,18 @@ export async function handle(
   message: IMessage,
   msgSource: IMessageSource
 ): Promise<IHandlerResponse> {
-  const state = await loadState(message.author);
+  const state = await loadState(message.sender);
   const command = message.text;
 
   for (const mod of modules) {
     const result = await mod.handle(command, message, msgSource);
     if (result) {
-      saveState(state, message.author);
+      saveState(state, message.sender);
       return result;
     }
   }
 
   // We did not get a response.
-  saveState(state, message.author);
-  return { message: "I did not follow. TODO: Help link." };
+  saveState(state, message.sender);
+  return new Response("I did not follow. TODO: Help link.", message.id);
 }
