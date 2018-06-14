@@ -222,7 +222,7 @@ async function removeMembership(
 
 function needToBeAnAdmin(identityId: string, message: IMessage) {
   return new Response(
-    `You don't have permissions to update the membership of '${identityId}'. Need to be an admin.`,
+    `You don't have permissions to update the membership of ${identityId}. Need to be an admin.`,
     message.id
   );
 }
