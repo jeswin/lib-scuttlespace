@@ -3,8 +3,6 @@ export { default as setup } from "./setup";
 /*
   Supported commands
   
-  A given sender can have multiple usernames associated with it, one of which will be in is_primary state.
-
   Bookmarks
   ---------
   # Bookmark a link with a description
