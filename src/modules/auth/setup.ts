@@ -8,6 +8,7 @@ export default async function setup() {
         id TEXT NOT NULL,
         enabled INTEGER NOT NULL,
         domain TEXT,
+        about TEXT,
         CONSTRAINT unique_identity_id UNIQUE (id),
         CONSTRAINT unique_identity_domain UNIQUE (domain)
       )`

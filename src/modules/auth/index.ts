@@ -44,14 +44,15 @@ export { default as setup } from "./setup";
 */
 
 const parser = humanist([
-  ["id", 1],
-  ["enable", 0],
-  ["disable", 0],
-  ["destroy", 0],
-  ["domain", 1],
-  ["admin", 1],
-  ["user", 1],
-  ["remove", 1]
+  ["id", "single"],
+  ["about", "multi", { join: true }],
+  ["domain", "single"],
+  ["enable", "flag"],
+  ["disable", "flag"],
+  ["admin", "single"],
+  ["user", "single"],
+  ["remove", "single"],
+  ["destroy", "flag"]
 ]);
 
 export async function handle(

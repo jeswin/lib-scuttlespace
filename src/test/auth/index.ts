@@ -12,6 +12,7 @@ import addAdmin from "./add-admin";
 import addUser from "./add-user";
 import removeUser from "./remove-user";
 import cannotRemoveOneself from "./cannot-remove-oneself";
+import updateAbout from "./update-about";
 
 export function createMessage(msg: any): IMessage {
   const base = {
@@ -55,5 +56,7 @@ export default function run(msgSource: IMessageSource) {
     it("removes a user", removeUser(msgSource));
 
     it("cannot remove oneself", cannotRemoveOneself(msgSource));
+
+    it("updates about", updateAbout(msgSource));
   });
 }

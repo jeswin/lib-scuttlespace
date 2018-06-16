@@ -31,6 +31,8 @@ export default async function modifyIdentity(
       return await addMembership(idRow, args, args.user, "USER", message);
     } else if (args.remove) {
       return await removeMembership(idRow, args, args.remove, message);
+    } else if (args.about) {
+      return await updateAbout(idRow, args, args.about, message);
     } else {
       return await didNotUnderstand(command, message);
     }
@@ -215,6 +217,27 @@ async function removeMembership(
         message.id
       );
     }
+  } else {
+    return needToBeAnAdmin(identityId, message);
+  }
+}
+
+async function updateAbout(
+  idRow: IExistingIdentityResult,
+  args: any,
+  about: string,
+  message: IMessage
+) {
+  const { identityId, userId, membershipType } = idRow;
+  if (membershipType === "ADMIN") {
+    const db = await getDb();
+    db.prepare(
+      "UPDATE identity SET about=$about WHERE id=$identity_id"
+    ).run({ identity_id: identityId, about });
+    return new Response(
+      `Updated profile information for ${identityId}.`,
+      message.id
+    );
   } else {
     return needToBeAnAdmin(identityId, message);
   }

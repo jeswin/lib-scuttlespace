@@ -218,9 +218,9 @@ he@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/he/-/he-1.1.1.tgz#93410fd21b009735151f8868c2f271f3427e23fd"
 
-humanist@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/humanist/-/humanist-0.0.3.tgz#37d16a4979747ee79ed750b8c398ded7b176c1b3"
+humanist@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/humanist/-/humanist-0.0.4.tgz#684f37b31c55791da567643137dac485564dbe89"
 
 inflight@^1.0.4:
   version "1.0.6"
