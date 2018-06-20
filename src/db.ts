@@ -1,10 +1,27 @@
-import Database = require("better-sqlite3");
+import pg = require("pg");
 import * as config from "./config";
 import { log } from "./logger";
 
-let dbName = config.dbName;
-export async function setDbName(name: string) {
-  dbName = name;
+export interface IDbConfig {
+  database: string;
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+}
+
+let pool: pg.Pool;
+export async function setDbConfiguration(dbConfig: IDbConfig) {
+  pool = new pg.Pool(dbConfig);
+}
+
+export async function withClient<T>(
+  fn: (client: pg.PoolClient) => Promise<T | undefined>
+): Promise<T | undefined> {
+  const client = await pool.connect();
+  const result = fn(client);
+  client.release();
+  return result;
 }
 
 let database: Database | undefined;
@@ -60,20 +77,3 @@ export function sqlInsert(args: { table: string; fields: string[] }) {
 
   return sql;
 }
-
-// const begin = db.prepare('BEGIN');
-// const commit = db.prepare('COMMIT');
-// const rollback = db.prepare('ROLLBACK');
-
-// // Higher order function - returns a function that always runs in a transaction
-// async function asTransaction(func: any) {
-//   return function (...args) {
-//     begin.run();
-//     try {
-//       func(...args);
-//       commit.run();
-//     } finally {
-//       if (db.inTransaction) rollback.run();
-//     }
-//   };
-// }

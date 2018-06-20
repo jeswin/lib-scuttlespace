@@ -19,9 +19,9 @@ export default async function setup() {
 
   await createTable(
     "user",
-    `CREATE TABLE user ( 
+    `CREATE TABLE user (
         rowid INTEGER PRIMARY KEY AUTOINCREMENT,
-        id TEXT NOT NULL,
+        network_id TEXT NOT NULL,
         primary_identity_id TEXT,
         CONSTRAINT unique_user_id UNIQUE (id)
       )`

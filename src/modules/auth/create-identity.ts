@@ -1,7 +1,8 @@
 import * as fs from "fs-extra";
 import * as path from "path";
-import { dataDir, dbDir } from "../../config";
-import { getDb, sqlInsert } from "../../db";
+import PGParams from "pg-params";
+import { dataDir } from "../../config";
+import { getDb, sqlInsert, withClient } from "../../db";
 import Response from "../../Response";
 import { IMessage } from "../../types";
 
@@ -11,12 +12,23 @@ export default async function createIdentity(
   command: string,
   message: IMessage
 ) {
-  const db = await getDb();
+  return await withClient(async client => {
+    await client.query("BEGIN");
 
-  // See if the user already exists.
-  const user = db
-    .prepare(`SELECT * FROM user WHERE id=$sender`)
-    .get({ sender });
+    try {
+      const params = new PGParams({ sender });
+      const { rows } = await client.query(
+        `SELECT * FROM user WHERE id=${params.key("sender")}`,
+        params.values()
+      );
+
+      
+
+      await client.query("COMMIT");
+    } catch {
+      await client.query("ROLLBACK");
+    }
+  });
 
   db.transaction(
     [
