@@ -1,3 +1,3 @@
 # lib-scuttlespace
-Shared Modules for ScuttleSpace
+Shared Modules for Scuttlespace
 

@@ -6,7 +6,7 @@ export interface IConversationState {
   contexts: string[];
 }
 
-interface IScuttleSpaceModule {
+interface IScuttlespaceModule {
   handle(
     command: string,
     message: IMessage,
@@ -15,7 +15,7 @@ interface IScuttleSpaceModule {
   setup(): Promise<void>;
 }
 
-const modules: IScuttleSpaceModule[] = [auth];
+const modules: IScuttlespaceModule[] = [auth];
 
 export async function init() {
   for (const mod of modules) {
